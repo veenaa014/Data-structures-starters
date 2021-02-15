@@ -1,3 +1,6 @@
+
+from collections import deque
+
 # Class representation of binary tree
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):
@@ -7,6 +10,8 @@ class TreeNode:
 
     def printtree(self):
         print(self.value)
+
+########################################################################################################################################################################################################## 
 
 # tree traversals - recursive
 def inorderTraversal(root):
@@ -18,7 +23,24 @@ def preorderTraversal(root):
 def postorderTraversal(root):
     return postorderTraversal(root.left) + postorderTraversal(root.right) + [root.value] if root else []
 
+def levelOrderTraversal(root):
+    ans = []
+    level = 1
+    helperTraverse(root, level, ans)
+    return ans
 
+def helperTraverse(root, level, ans):
+    if not root:
+        return
+    if level > len(ans):
+        ans.append([root.value])
+    else:
+        ans[level-1].append(root.value)
+    helperTraverse(root.left, level + 1, ans)
+    helperTraverse(root.right, level + 1, ans)
+
+
+##########################################################################################################################################################################################################    
 # tree traversals - iterative
 def inorderIterative(root):
     stack = []
@@ -54,8 +76,7 @@ def preorderIterative(root):
         root = node.right
     return res
 
-    # method 2
-    ### storing only right side in stack
+    # method 2 - storing only right side in stack
     # stack = []
     # res = []
     # curr = root
@@ -64,6 +85,7 @@ def preorderIterative(root):
     # while stack or curr:
     #     if not curr:
     #         curr = stack.pop()
+        
     #     while curr:
     #         res.append(curr.value)
     #         if curr.right:
@@ -99,6 +121,30 @@ def postorderIterative(root):
     res.reverse()
     return res
 
+def levelorderIterative(root):
+    res = []
+    if not root:
+        return []
+    queue = deque()
+    queue.append(root)
+    while queue:
+        n = len(queue)
+        sublist = []
+        for _ in range(n):
+            node = queue.popleft()
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
+            sublist.append(node.value)
+        res.append(sublist)
+    return res
+
+########################################################################################################################################################################################################## 
+
+
+
+
 
 a = TreeNode(27)
 b = TreeNode()
@@ -113,4 +159,4 @@ b.right = d
 d.left = e
 c.right = f
 
-print(postorderTraversal(a))
+print(levelorderIterative(a))
