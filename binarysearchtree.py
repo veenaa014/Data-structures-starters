@@ -67,10 +67,91 @@ def searchNode(root, key):
 
 
 #################################################################################################################################
-# delete node in BST
-# def deleteNodeBST(root, key):
+# delete node in BST - iterative
 
 
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def deleteNode(self, root: TreeNode, key: int) -> TreeNode:
+        if not root:
+            return root
+        parent, node = self.findNode(root, key)
+        
+        #node does not exist
+        if node == -1:
+            return root
+        #no children
+        elif node.left == None and node.right == None:
+            if parent == None:
+                return None
+            else:
+                if parent.left == node:
+                    parent.left = None
+                else:
+                    parent.right = None
+                return root
+        #1 child
+        elif node.left == None and node.right != None:
+            if parent == None:
+                return node.right
+            else:
+                if parent.left == node:
+                    parent.left = node.right
+                else:
+                    parent.right = node.right
+                return root
+        #1 child       
+        elif node.left != None and node.right == None:
+            if parent == None:
+                return node.left
+            else:
+                if parent.left == node:
+                    parent.left = node.left
+                else:
+                    parent.right = node.left
+                return root
+        #2 child
+        elif node.left != None and node.right != None:
+            temp = self.smallestrightnode(node.right)
+            if parent == None: #root node to be deleted
+                node.val = temp.val
+                p, n = self.findNode(node.right, temp.val)
+                if p == None:
+                    node.right = n.right
+                else:
+                    p.left = n.right
+            else:
+                node.val = temp.val
+                p, n = self.findNode(node.right, temp.val)
+                if p == None:
+                    node.right = n.right
+                else:
+                    p.left = n.right
+            return root
+                
+                
+    def findNode(self, root, key):
+        parent = None
+        while root:
+            if root.val == key:
+                return (parent, root)
+            parent = root
+            if root.val > key:
+                root = root.left
+            else:
+                root = root.right
+        return (-1, -1)
+    
+    def smallestrightnode(self, root):
+        res = root
+        while root:
+            res = root
+            root = root.left
+        return res
 #################################################################################################################################
 
 a = TreeNode(1)
