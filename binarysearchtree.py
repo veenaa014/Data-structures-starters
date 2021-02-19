@@ -1,5 +1,4 @@
 from treesDs import TreeNode, inorderIterative
-# insert, search, delete, print path
 
 # Insert Node in BST - iterative and recursive
 
@@ -67,101 +66,120 @@ def searchNode(root, key):
 
 
 #################################################################################################################################
-# delete node in BST - iterative
+# delete node in BST
+# Step1 : find if node exists or not
+# Step 2 - delete the node based on 3 categories a) leaf node b) has only one child c) has both child
 
+def deleteNodeIterative(root,key):
+    if not root:
+        return root
 
-# class TreeNode:
-#     def __init__(self, val=0, left=None, right=None):
-#         self.val = val
-#         self.left = left
-#         self.right = right
-class Solution:
-    def deleteNode(self, root: TreeNode, key: int) -> TreeNode:
-        if not root:
-            return root
-        parent, node = self.findNode(root, key)
-        
-        #node does not exist
-        if node == -1:
-            return root
-        #no children
-        elif node.left == None and node.right == None:
-            if parent == None:
-                return None
-            else:
-                if parent.left == node:
-                    parent.left = None
-                else:
-                    parent.right = None
-                return root
-        #1 child
-        elif node.left == None and node.right != None:
-            if parent == None:
-                return node.right
-            else:
-                if parent.left == node:
-                    parent.left = node.right
-                else:
-                    parent.right = node.right
-                return root
-        #1 child       
-        elif node.left != None and node.right == None:
-            if parent == None:
-                return node.left
-            else:
-                if parent.left == node:
-                    parent.left = node.left
-                else:
-                    parent.right = node.left
-                return root
-        #2 child
-        elif node.left != None and node.right != None:
-            temp = self.smallestrightnode(node.right)
-            if parent == None: #root node to be deleted
-                node.val = temp.val
-                p, n = self.findNode(node.right, temp.val)
-                if p == None:
-                    node.right = n.right
-                else:
-                    p.left = n.right
-            else:
-                node.val = temp.val
-                p, n = self.findNode(node.right, temp.val)
-                if p == None:
-                    node.right = n.right
-                else:
-                    p.left = n.right
-            return root
-                
-                
-    def findNode(self, root, key):
-        parent = None
-        while root:
-            if root.val == key:
-                return (parent, root)
-            parent = root
-            if root.val > key:
-                root = root.left
-            else:
-                root = root.right
-        return (-1, -1)
+    parent, node = findNode(root, key)
     
-    def smallestrightnode(self, root):
-        res = root
-        while root:
-            res = root
+    #node does not exist
+    if node == -1:
+        return root
+
+    #no children
+    elif node.left == None and node.right == None:
+        if parent == None: #node to be deleted is root and has no children, return empty tree
+            return None
+        else: #parent exists
+            if parent.left == node:
+                parent.left = None
+            else:
+                parent.right = None
+            return root
+
+    #1 child - right
+    elif node.left == None and node.right != None:
+        if parent == None: #node to be deleted is root and node has only right child
+            return node.right
+        else:
+            if parent.left == node:
+                parent.left = node.right
+            else:
+                parent.right = node.right
+            return root
+    #1 child - left 
+    elif node.left != None and node.right == None:
+        if parent == None: #node to be deleted is root and node has only left child
+            return node.left
+        else:
+            if parent.left == node:
+                parent.left = node.left
+            else:
+                parent.right = node.left
+            return root
+
+    #2 child - replace the node value with smallest node in the right subtree, traverse the right subtree
+    # and delete that smallest node(or the leftmost node)
+    elif node.left != None and node.right != None:
+        temp = smallestrightnode(node.right)
+        node.value = temp.value
+        p, n = findNode(node.right, temp.value)
+        if p == None:
+            node.right = n.right
+        else:
+            p.left = n.right
+        return root
+
+# ---------helper functions--------------------
+#finds if node is in subtree- returns (parent, node) if key exists in the tree
+# if not found returns (-1,-1)
+def findNode(root, key):
+    parent = None
+    while root:
+        if root.value == key:
+            return (parent, root)
+        parent = root
+        if root.value > key:
             root = root.left
-        return res
+        else:
+            root = root.right
+    return (-1, -1)
+
+#returns the smallest node in the right subtree of node - called only when node to be deleted has both left and right children
+def smallestrightnode(node):
+    res = node
+    while node:
+        res = node
+        node = node.left
+    return res
+
+
+def deleteNodeRecursive(root, key):
+    if root is None:
+        return None
+    if root.value == key:
+        if not root.left:
+            return root.right
+        elif not root.right:
+            return root.left
+        else:
+            node = root.right
+            while node.left:
+                node = node.left
+            root.value = node.value
+            root.right = deleteNodeRecursive(root.right, node.value)
+    elif root.value > key:
+        root.left = deleteNodeRecursive(root.left, key)
+    else:
+        root.right = deleteNodeRecursive(root.right, key)
+    return root
 #################################################################################################################################
 
 a = TreeNode(1)
 b = TreeNode(2)
-c = TreeNode(3)
-
+c = TreeNode(10)
+d = TreeNode(8)
 b.left = a
 b.right = c
+c.left = d
 
 print("before inserting", inorderIterative(b))
 ans = insertNodeIterative(b, 100)
 print("after inserting ", inorderIterative(ans))
-print(searchNode(b, 30))
+print(inorderIterative(b))
+node = (deleteNodeIterative(b, 878))
+print(inorderIterative(node))
